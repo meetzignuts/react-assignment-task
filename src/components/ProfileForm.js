@@ -26,7 +26,7 @@ const ProfileForm = () => {
         setError('');
         let response = checkEmailExist(data.email, res.user.id);
         if(response){
-            updateUser(res.index, {id: res.user.id, ...data});
+            updateUser(res.index, {id: res.user.id, password: res.user.password, ...data});
             setSuccessMessage('Profile Updated Successfully!'); // Set success message for the snackbar
             setOpenSnackbar(true); // Show the snackbar
         }else{
