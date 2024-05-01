@@ -1,5 +1,7 @@
+import { LOCALSTORAGE_KEYS } from '../utils/constants';
+
 export const getUserById = (id) => {
-    let users = localStorage.getItem('users');
+    let users = localStorage.getItem(LOCALSTORAGE_KEYS.USER_DATA);
     if(users){
         users = JSON.parse(users);
         return {index: users.findIndex(user => user.id == id),user: users.find(user => user.id == id)};
@@ -9,7 +11,7 @@ export const getUserById = (id) => {
 }
 
 export const checkEmailExist = (email, id) => {
-    let users = localStorage.getItem('users');
+    let users = localStorage.getItem(LOCALSTORAGE_KEYS.USER_DATA);
     if(users){
         users = JSON.parse(users);
         return users.findIndex(user => user.id != id && user.email == email) == -1;
@@ -19,11 +21,11 @@ export const checkEmailExist = (email, id) => {
 }
 
 export const changePassword = (index, password) => {
-    let users = localStorage.getItem('users');
+    let users = localStorage.getItem(LOCALSTORAGE_KEYS.USER_DATA);
     if(users){
         users = JSON.parse(users);
         users[index].password = password;
-        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem(LOCALSTORAGE_KEYS.USER_DATA, JSON.stringify(users));
         return true;
     }else{
         return null;
@@ -31,11 +33,11 @@ export const changePassword = (index, password) => {
 }
 
 export const updateUser = (index, data) => {
-    let users = localStorage.getItem('users');
+    let users = localStorage.getItem(LOCALSTORAGE_KEYS.USER_DATA);
     if(users){
         users = JSON.parse(users);
         users[index] = data;
-        localStorage.setItem('users', JSON.stringify(users));
+        localStorage.setItem(LOCALSTORAGE_KEYS.USER_DATA, JSON.stringify(users));
         return true;
     }else{
         return null;

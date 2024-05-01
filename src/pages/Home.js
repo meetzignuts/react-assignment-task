@@ -1,21 +1,10 @@
-import React, { useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
-import Navbar from '../components/Navbar';
+import React from 'react';
 import ProductList from '../components/ProductList';
+import DashboardLayout from '../layouts/DashboardLayout';
 
 const Home = () => {
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!localStorage.getItem("userLoggedIn")) {
-            navigate("/login");
-        }
-    }, []);
-
     return (
-        <div className='w-100'>
-            <Navbar />
-            <ProductList/>
-        </div>
+        <DashboardLayout children={<ProductList/>} />
     );
 };
 

@@ -2,7 +2,6 @@ import React, {useEffect, useState} from 'react';
 import Typography from '@mui/material/Typography';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
-import Navbar from '../components/Navbar';
 import { Grid, Container } from '@mui/material';
 import { useNavigate, useParams } from "react-router-dom";
 import {getProductDetails} from '../services/Product';
@@ -12,6 +11,7 @@ import ReactImageGallery from "react-image-gallery";
 import '../styles/style.css';
 import Box from '@mui/material/Box';
 import Rating from '@mui/material/Rating';
+import DashboardLayout from '../layouts/DashboardLayout';
 
 
 
@@ -47,8 +47,7 @@ const ProductDetails = () => {
     }, []);
 
     return (
-        <div>
-            <Navbar />
+        <DashboardLayout children={
             <Container maxWidth="xl" className='mt-4'>
                 <div role="presentation">
                     <Breadcrumbs aria-label="breadcrumb">
@@ -100,8 +99,7 @@ const ProductDetails = () => {
                     </Grid>
                     </CardContent>
                 </Card>
-            </Container>
-        </div>
+            </Container>} />
     );
 };
 

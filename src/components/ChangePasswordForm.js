@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
-import { TextField, Button, Typography, Grid, Container } from '@mui/material';
+import { TextField, Button, Typography, Grid } from '@mui/material';
 import { getUserById, changePassword } from '../services/User';
 import { SnackBarMessage } from './SnackbarMessage';
 import { useNavigate } from "react-router-dom";
 import bcrypt from 'bcryptjs';
+import { message } from '../utils/messages';
+import { LOCALSTORAGE_KEYS } from '../utils/constants';
+import {ChangePasswordSchema} from '../utils/validations';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const LoginForm = () => {
 
@@ -15,17 +19,16 @@ const LoginForm = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
-    const { control, handleSubmit, formState: { errors, isDirty, isValid }, reset, watch } = useForm({
-        mode: 'onChange'
+    const { control, handleSubmit, formState: { errors, isDirty, isValid }, reset } = useForm({
+        mode: 'onChange',
+        resolver: yupResolver(ChangePasswordSchema)
     });
-
-    const password = watch("newPassword");
 
     const onSubmit = async (data) => {
         setError('');
-        let result = await getUserById(localStorage.getItem('userLoggedIn'));
+        let result = await getUserById(localStorage.getItem(LOCALSTORAGE_KEYS.LOGGEDIN_USER));
         if(!result) {
-          localStorage.removeItem("userLoggedIn");
+          localStorage.removeItem(LOCALSTORAGE_KEYS.LOGGEDIN_USER);
           navigate("/login");
         }
         const response = await bcrypt.compare(data.currentpassword, result.user["password"]);
@@ -33,15 +36,15 @@ const LoginForm = () => {
           data.newPassword = await bcrypt.hash(data.newPassword, 10);
           const res = changePassword(result.index, data.newPassword);
           if(!res){
-            localStorage.removeItem("userLoggedIn");
+            localStorage.removeItem(LOCALSTORAGE_KEYS.LOGGEDIN_USER);
             navigate("/login");
           }else{
-            setSuccessMessage('Password change successfully');
+            setSuccessMessage(message.AUTH.CHANGE_PASSWORD.SUCCESS);
             setOpenSnackbar(true);
             reset();
           }
         }else{
-          setError('Current password is invalid');
+          setError(message.AUTH.CHANGE_PASSWORD.CURRENT_PASSWORD_INVALID);
         }
     };
 
@@ -59,9 +62,8 @@ const LoginForm = () => {
             control={control}
             defaultValue=""
             render={({ field }) => (
-              <TextField {...field} label="Password" type="password" fullWidth margin="normal" error={!!errors.currentpassword} helperText={errors.currentpassword && "Current Password is required and must be at least 8 characters long"} />
+              <TextField {...field} label="Password" type="password" fullWidth margin="normal" error={!!errors.currentpassword} helperText={errors.currentpassword && message.FORM_VALIDATIONS.CURRENT_PASSWORD.LENGTH} />
             )}
-            rules={{ required: 'Current Password is required' }}
           />
           </Grid>
           <Grid item xs={12}>
@@ -70,9 +72,8 @@ const LoginForm = () => {
             control={control}
             defaultValue=""
             render={({ field }) => (
-              <TextField {...field} label="New Password" type="password" fullWidth margin="normal" error={!!errors.newPassword} helperText={errors.newPassword && "New Password is required and must be at least 8 characters long"} />
+              <TextField {...field} label="New Password" type="password" fullWidth margin="normal" error={!!errors.newPassword} helperText={errors.newPassword && message.FORM_VALIDATIONS.NEW_PASSWORD.LENGTH} />
             )}
-            rules={{ required: 'New Password is required', minLength: { value: 8, message: 'New Password must be at least 8 characters long' } }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -83,10 +84,6 @@ const LoginForm = () => {
             render={({ field }) => (
               <TextField {...field} label="Confirm Password" type="password" fullWidth margin="normal" error={!!errors.confirmNewPassword} helperText={errors.confirmNewPassword && errors.confirmNewPassword.message} />
             )}
-            rules={{ 
-              required: 'Please confirm your password',
-              validate: value => value === password || 'Passwords do not match'
-            }}
           />
         </Grid>
         {error && (

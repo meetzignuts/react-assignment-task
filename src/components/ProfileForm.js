@@ -4,19 +4,27 @@ import { TextField, Button, Grid, Typography } from '@mui/material';
 import { SnackBarMessage } from './SnackbarMessage';
 import { useNavigate } from "react-router-dom";
 import { getUserById, checkEmailExist, updateUser } from '../services/User';
+import { message } from '../utils/messages';
+import { LOCALSTORAGE_KEYS } from '../utils/constants';
+import {ProfileSchema} from '../utils/validations';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const ProfileForm = () => {
     const navigate = useNavigate();
+
     const { control, handleSubmit, formState: { errors, isDirty, isValid } } = useForm({
-        mode: 'onChange'
+        mode: 'onChange',
+        resolver: yupResolver(ProfileSchema)
     });
+
+    
 
     const [successMessage, setSuccessMessage] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
-    const res = getUserById(localStorage.getItem('userLoggedIn'));
+    const res = getUserById(localStorage.getItem(LOCALSTORAGE_KEYS.LOGGEDIN_USER));
         if(!res) {
-            localStorage.removeItem("userLoggedIn");
+            localStorage.removeItem(LOCALSTORAGE_KEYS.LOGGEDIN_USER);
             navigate("/login");
         }
 
@@ -27,10 +35,10 @@ const ProfileForm = () => {
         let response = checkEmailExist(data.email, res.user.id);
         if(response){
             updateUser(res.index, {id: res.user.id, password: res.user.password, ...data});
-            setSuccessMessage('Profile Updated Successfully!'); // Set success message for the snackbar
+            setSuccessMessage(message.AUTH.UPDATE_PROFILE.SUCCESS); // Set success message for the snackbar
             setOpenSnackbar(true); // Show the snackbar
         }else{
-            setError('Email already exists');
+            setError(message.AUTH.UPDATE_PROFILE.ALREADY_EXISTS);
         }
     };
 
@@ -47,9 +55,9 @@ const ProfileForm = () => {
             control={control}
             defaultValue={res ? res.user["firstName"] : ''}
             render={({ field }) => (
-              <TextField {...field} label="First Name" fullWidth margin="normal" error={!!errors.firstName} helperText={errors.firstName && "First name is required"} />
+              <TextField {...field} label="First Name" fullWidth margin="normal" error={!!errors.firstName} helperText={errors.firstName && message.FORM_VALIDATIONS.FIRST_NAME.REQUIRED} />
             )}
-            rules={{ required: 'First name is required' }}
+            
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -58,9 +66,9 @@ const ProfileForm = () => {
             control={control}
             defaultValue={res ? res.user["lastName"] : ''}
             render={({ field }) => (
-              <TextField {...field} label="Last Name" fullWidth margin="normal" error={!!errors.lastName} helperText={errors.lastName && "Last name is required"} />
+              <TextField {...field} label="Last Name" fullWidth margin="normal" error={!!errors.lastName} helperText={errors.lastName && message.FORM_VALIDATIONS.LAST_NAME.REQUIRED} />
             )}
-            rules={{ required: 'Last name is required' }}
+            
           />
         </Grid>
         <Grid item xs={12}>
@@ -71,7 +79,7 @@ const ProfileForm = () => {
             render={({ field }) => (
               <TextField {...field} label="Email" fullWidth margin="normal" type="email" error={!!errors.email} helperText={errors.email && errors.email.message} />
             )}
-            rules={{ required: 'Email is required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email format' } }}
+            
           />
         </Grid>
         <Grid item xs={12}>
@@ -82,7 +90,7 @@ const ProfileForm = () => {
             render={({ field }) => (
               <TextField {...field} label="Mobile Number" fullWidth margin="normal" error={!!errors.mobileNumber} helperText={errors.mobileNumber && errors.mobileNumber.message} />
             )}
-            rules={{ required: 'Mobile number is required' }}
+            
           />
         </Grid>
         {error && (

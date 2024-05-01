@@ -4,29 +4,30 @@ import { TextField, Button, Grid, Typography } from '@mui/material';
 import { storeUser, getUserByEmail } from '../services/Signup';
 import { SnackBarMessage } from './SnackbarMessage';
 import bcrypt from 'bcryptjs';
+import { message } from '../utils/messages';
+import {SignupSchema} from '../utils/validations';
+import { yupResolver } from '@hookform/resolvers/yup';
 
 const SignupForm = () => {
-    const { control, handleSubmit, formState: { errors, isDirty, isValid }, watch, reset } = useForm({
-        mode: 'onChange'
+    const { control, handleSubmit, formState: { errors, isDirty, isValid }, reset } = useForm({
+        mode: 'onChange',
+        resolver: yupResolver(SignupSchema)
     });
 
     const [successMessage, setSuccessMessage] = useState('');
     const [openSnackbar, setOpenSnackbar] = useState(false);
 
     const [error, setError] = useState('');
-    
-    
-    const password = watch("password");
 
     const onSubmit = async (data) => {
         setError('');
         if(getUserByEmail(data.email)){
-            setError('User already exists');
+            setError(message.AUTH.SIGNUP.ALREADY_EXISTS);
             return;
         }
         data.password = await bcrypt.hash(data.password, 10);
         storeUser(data);
-        setSuccessMessage('Signup successful!'); // Set success message for the snackbar
+        setSuccessMessage(message.AUTH.SIGNUP.SUCCESS); // Set success message for the snackbar
         setOpenSnackbar(true); // Show the snackbar
         reset();
     };
@@ -44,9 +45,8 @@ const SignupForm = () => {
             control={control}
             defaultValue=""
             render={({ field }) => (
-              <TextField {...field} label="First Name" fullWidth margin="normal" error={!!errors.firstName} helperText={errors.firstName && "First name is required"} />
+              <TextField {...field} label="First Name" fullWidth margin="normal" error={!!errors.firstName} helperText={errors.firstName &&  message.FORM_VALIDATIONS.FIRST_NAME.REQUIRED} />
             )}
-            rules={{ required: 'First name is required' }}
           />
         </Grid>
         <Grid item xs={12} sm={6}>
@@ -55,9 +55,8 @@ const SignupForm = () => {
             control={control}
             defaultValue=""
             render={({ field }) => (
-              <TextField {...field} label="Last Name" fullWidth margin="normal" error={!!errors.lastName} helperText={errors.lastName && "Last name is required"} />
+              <TextField {...field} label="Last Name" fullWidth margin="normal" error={!!errors.lastName} helperText={errors.lastName &&  message.FORM_VALIDATIONS.LAST_NAME.REQUIRED} />
             )}
-            rules={{ required: 'Last name is required' }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -68,7 +67,6 @@ const SignupForm = () => {
             render={({ field }) => (
               <TextField {...field} label="Email" fullWidth margin="normal" type="email" error={!!errors.email} helperText={errors.email && errors.email.message} />
             )}
-            rules={{ required: 'Email is required', pattern: { value: /^\S+@\S+$/i, message: 'Invalid email format' } }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -79,7 +77,6 @@ const SignupForm = () => {
             render={({ field }) => (
               <TextField {...field} label="Mobile Number" fullWidth margin="normal" error={!!errors.mobileNumber} helperText={errors.mobileNumber && errors.mobileNumber.message} />
             )}
-            rules={{ required: 'Mobile number is required' }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -88,9 +85,8 @@ const SignupForm = () => {
             control={control}
             defaultValue=""
             render={({ field }) => (
-              <TextField {...field} label="Password" type="password" fullWidth margin="normal" error={!!errors.password} helperText={errors.password && "Password is required and must be at least 8 characters long"} />
+              <TextField {...field} label="Password" type="password" fullWidth margin="normal" error={!!errors.password} helperText={errors.password && message.FORM_VALIDATIONS.PASSWORD.LENGTH} />
             )}
-            rules={{ required: 'Password is required', minLength: { value: 8, message: 'Password must be at least 8 characters long' } }}
           />
         </Grid>
         <Grid item xs={12}>
@@ -101,10 +97,6 @@ const SignupForm = () => {
             render={({ field }) => (
               <TextField {...field} label="Confirm Password" type="password" fullWidth margin="normal" error={!!errors.confirmPassword} helperText={errors.confirmPassword && errors.confirmPassword.message} />
             )}
-            rules={{ 
-              required: 'Please confirm your password',
-              validate: value => value === password || 'Passwords do not match'
-            }}
           />
         </Grid>
         {error && (
@@ -123,7 +115,6 @@ const SignupForm = () => {
     </form>
         <SnackBarMessage time={6000} message={successMessage} openSnackbar={openSnackbar} handleCloseSnackbar={handleCloseSnackbar}/>
     </div>
-    
   );
 };
 

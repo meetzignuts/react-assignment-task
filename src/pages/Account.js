@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import Navbar from '../components/Navbar';
+import React from 'react';
 import Breadcrumbs from '@mui/material/Breadcrumbs';
 import Link from '@mui/material/Link';
 import { Typography, Container, Grid, Paper } from '@mui/material';
 import { useNavigate } from "react-router-dom";
 import ChangePasswordForm from '../components/ChangePasswordForm';
 import ProfileForm from '../components/ProfileForm';
+import DashboardLayout from '../layouts/DashboardLayout';
 
 
 const Account = () => {
@@ -16,8 +16,7 @@ const Account = () => {
     }
 
     return (
-        <div className='w-100'>
-            <Navbar />
+        <DashboardLayout children={
             <Container maxWidth="xl" className='mt-4'>
                 <div role="presentation">
                     <Breadcrumbs aria-label="breadcrumb">
@@ -46,7 +45,7 @@ const Account = () => {
                     </Grid>
                 </Grid>
             </Container>
-        </div>
+        } />
     )
 }
 

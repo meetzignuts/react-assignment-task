@@ -1,16 +1,11 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import { Typography, Container, Grid, Paper } from '@mui/material';
 import SignupForm from '../components/SignupForm';
 import { Link } from 'react-router-dom';
-import { useNavigate } from "react-router-dom";
+
 
 const Signup = () => {
-    const navigate = useNavigate();
-    useEffect(() => {
-      if(localStorage.getItem("userLoggedIn")){
-          navigate("/home");
-      }
-  },[]);
+    
     return (
       <Container maxWidth="sm">
         <Grid container justifycontent="center" alignItems="center" style={{ minHeight: '100vh' }}>
